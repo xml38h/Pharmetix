@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmetix – Drug Likeness Tool</title>
+</head>
+
+<body>
+
+    <h1>Pharmetix – Drug Likeness Prediction</h1>
+
+    <form method="POST">
+        <textarea name="user_input" rows="8" cols="60"
+                  placeholder="Paste your SMILES or input text here, one per line"></textarea>
+        <br><br>
+        <button type="submit">Run</button>
+    </form>
+
+    {% if results %}
+        <h2>Results</h2>
+        <table border="1" cellpadding="6">
+            <tr>
+                <th>#</th>
+                <th>Input</th>
+                <th>Drug-likeness</th>
+                <th>Details</th>
+            </tr>
+
+            {% for r in results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ r.input_text }}</td>
+                <td>{{ r.drug_likeness }}</td>
+                <td>{{ r.details }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</body>
+</html>
