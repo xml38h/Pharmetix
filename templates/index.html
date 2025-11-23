@@ -7,8 +7,8 @@
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
-            --bg: #0f172a;
-            --card-bg: #0b1120;
+            --bg: #020617;
+            --card-bg: #020617;
             --card-border: #1f2937;
             --text: #e5e7eb;
             --muted: #9ca3af;
@@ -16,9 +16,7 @@
             --success: #22c55e;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -34,7 +32,7 @@
 
         .page {
             width: 100%;
-            max-width: 980px;
+            max-width: 1040px;
         }
 
         .header {
@@ -58,19 +56,17 @@
         }
 
         .card {
-            background: rgba(15, 23, 42, 0.94);
+            background: rgba(15, 23, 42, 0.95);
             border: 1px solid var(--card-border);
             border-radius: 16px;
-            padding: 20px 20px 24px;
+            padding: 20px 20px 22px;
             box-shadow:
                 0 18px 45px rgba(0, 0, 0, 0.7),
                 0 0 0 1px rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(16px);
         }
 
-        .card + .card {
-            margin-top: 18px;
-        }
+        .card + .card { margin-top: 18px; }
 
         .card-title {
             font-size: 16px;
@@ -81,14 +77,14 @@
         .card-hint {
             font-size: 13px;
             color: var(--muted);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .form-row {
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         label {
@@ -98,7 +94,7 @@
 
         textarea {
             width: 100%;
-            min-height: 140px;
+            min-height: 180px;
             resize: vertical;
             padding: 10px 12px;
             font-size: 13px;
@@ -115,17 +111,30 @@
             border-color: var(--primary);
         }
 
-        .form-footer {
+        .file-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-top: 6px;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 8px;
+            margin-bottom: 6px;
+        }
+
+        input[type="file"] {
+            font-size: 12px;
+            color: var(--muted);
         }
 
         .hint-small {
             font-size: 12px;
             color: var(--muted);
+        }
+
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
         }
 
         button {
@@ -153,14 +162,32 @@
             box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
         }
 
-        .btn-icon {
-            font-size: 16px;
+        .btn-icon { font-size: 16px; }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        .sketcher-box {
+            border-radius: 14px;
+            border: 1px dashed #1f2937;
+            background: #020617;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 16px;
         }
 
         .results-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             gap: 8px;
             margin-bottom: 10px;
         }
@@ -175,40 +202,71 @@
             color: var(--muted);
         }
 
-        table {
+        /* ====== جدول الريزلت (ستايل يشبه Excel) ====== */
+        .results-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            table-layout: fixed;
             border-radius: 10px;
             overflow: hidden;
-        }
-
-        thead {
+            border: 1px solid #111827;
             background: #020617;
         }
 
-        th, td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #111827;
-            text-align: left;
+        .results-table thead {
+            background: #030712;
         }
 
-        th {
-            font-weight: 600;
-            color: var(--muted);
+        .results-table th,
+        .results-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #111827;
+            border-right: 1px solid #111827;
+            text-align: left;
             font-size: 12px;
         }
 
-        tbody tr:nth-child(even) {
-            background: rgba(15, 23, 42, 0.9);
+        .results-table th:last-child,
+        .results-table td:last-child {
+            border-right: none;
+        }
+
+        .results-table tbody tr:nth-child(even) {
+            background: rgba(15, 23, 42, 0.96);
+        }
+
+        .col-index {
+            width: 46px;
+            text-align: center;
+        }
+
+        .col-input {
+            width: 18%;
+            font-size: 11px;
+            line-height: 1.2;
+            word-break: break-all;
+            white-space: normal;
+        }
+
+        .col-decision {
+            width: 70px;
+            text-align: center;
+        }
+
+        .col-details {
+            width: auto;
+            font-size: 11px;
+            line-height: 1.25;
         }
 
         .pill {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             padding: 2px 8px;
             font-size: 11px;
             border-radius: 999px;
+            min-width: 40px;
         }
 
         .pill-ok {
@@ -230,35 +288,24 @@
             text-align: right;
         }
 
-        @media (max-width: 720px) {
-            body {
-                padding: 20px 12px;
-            }
+        .download-btn {
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            box-shadow: none;
+            background: linear-gradient(135deg, #16a34a, #16a34a);
+        }
 
-            .card {
-                padding: 16px 14px 18px;
-            }
-
-            .logo {
-                font-size: 26px;
-            }
-
+        @media (max-width: 880px) {
+            body { padding: 20px 12px; }
+            .two-cols { grid-template-columns: minmax(0,1fr); }
             .form-footer {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
             button {
                 width: 100%;
                 justify-content: center;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 6px 8px;
             }
         }
     </style>
@@ -266,34 +313,47 @@
 <body>
 <div class="page">
     <header class="header">
-        <div class="logo">
-            Phar<span>metix</span>
-        </div>
+        <div class="logo">Phar<span>metix</span></div>
         <div class="subtitle">
-            Simple web tool for basic drug-likeness &amp; text-based screening.
+            Input molecules as SMILES / name / ID or upload a file.
         </div>
     </header>
 
-    <main>
+    <main class="two-cols">
+        <!-- العمود الأيسر: المربع الكبير + رفع الملف -->
         <section class="card">
             <div class="card-title">Input molecules</div>
             <div class="card-hint">
-                Paste one molecule per line (SMILES, ID, or name). Example:<br>
-                <span class="hint-small">CC(=O)OC1=CC=CC=C1C(=O)O &nbsp; | &nbsp; aspirin</span>
+                Paste one molecule per line (SMILES, ID, or name). Example:<br />
+                <span class="hint-small">
+                    CC(=O)OC1=CC=CC=C1C(=O)O &nbsp; | &nbsp; aspirin
+                </span>
             </div>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form-row">
                     <label for="user_input">Molecules list</label>
                     <textarea
                         id="user_input"
                         name="user_input"
-                        placeholder="aspirin&#10;caffeine&#10;CC(=O)OC1=CC=CC=C1C(=O)O"></textarea>
+                        placeholder="aspirin&#10;caffeine&#10;CC(=O)OC1=CC=CC=C1C(=O)O">{{ original_text }}</textarea>
+                </div>
+
+                <div class="file-row">
+                    <label for="molecule_file">Or upload a file (TXT / CSV / Excel)</label>
+                    <input
+                        type="file"
+                        id="molecule_file"
+                        name="molecule_file"
+                        accept=".txt,.csv,.smi,.smiles,.xlsx,.xls,.sdf,.sdf.gz" />
+                    <div class="hint-small">
+                        Tip: first column (or a column named <strong>SMILES</strong>) will be used.
+                    </div>
                 </div>
 
                 <div class="form-footer">
                     <div class="hint-small">
-                        Tip: you can paste a whole list from Excel – one entry per line.
+                        No hard limit on number of molecules – very large files may be slower.
                     </div>
                     <button type="submit">
                         <span class="btn-icon">▶</span>
@@ -303,46 +363,65 @@
             </form>
         </section>
 
-        {% if results %}
+        <!-- العمود الأيمن: الرسم -->
         <section class="card">
-            <div class="results-header">
-                <div class="results-title">Results</div>
-                <div class="results-meta">
-                    {{ results|length }} entries processed
-                </div>
+            <div class="card-title">Draw molecule (coming soon)</div>
+            <div class="card-hint">
+                A drawing widget will be embedded here later and converted to SMILES.
             </div>
 
-            <table>
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Input</th>
-                    <th>Drug-likeness</th>
-                    <th>Details</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for r in results %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ r.input_text }}</td>
-                        <td>
-                            {% if r.drug_likeness|lower == "yes" %}
-                                <span class="pill pill-ok">Likely drug-like</span>
-                            {% elif r.drug_likeness|lower == "no" %}
-                                <span class="pill pill-bad">Unfavorable</span>
-                            {% else %}
-                                {{ r.drug_likeness }}
-                            {% endif %}
-                        </td>
-                        <td>{{ r.details }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="sketcher-box">
+                Drawing widget placeholder.<br />
+                Later we can integrate a JS sketcher and send the SMILES into the same backend.
+            </div>
         </section>
-        {% endif %}
     </main>
+
+    {% if results %}
+    <section class="card" style="margin-top: 18px;">
+        <div class="results-header">
+            <div>
+                <div class="results-title">Results</div>
+                <div class="results-meta">{{ results|length }} molecules processed</div>
+            </div>
+
+            <a href="{{ url_for('download_results') }}">
+                <button type="button" class="download-btn">
+                    ⬇ Download (Excel)
+                </button>
+            </a>
+        </div>
+
+        <table class="results-table">
+            <thead>
+            <tr>
+                <th class="col-index">#</th>
+                <th class="col-input">Input</th>
+                <th class="col-decision">Decision</th>
+                <th class="col-details">Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for r in results %}
+                <tr>
+                    <td class="col-index">{{ loop.index }}</td>
+                    <td class="col-input">{{ r.input_text }}</td>
+                    <td class="col-decision">
+                        {% if r.drug_likeness is string and r.drug_likeness|lower == "yes" %}
+                            <span class="pill pill-ok">Yes</span>
+                        {% elif r.drug_likeness is string and r.drug_likeness|lower == "no" %}
+                            <span class="pill pill-bad">No</span>
+                        {% else %}
+                            {{ r.drug_likeness }}
+                        {% endif %}
+                    </td>
+                    <td class="col-details">{{ r.details }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% endif %}
 
     <div class="footer">
         Pharmetix · Internal demo – not for clinical decision-making.
