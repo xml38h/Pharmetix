@@ -1,0 +1,20 @@
+FROM continuumio/miniconda3
+
+# Create working directory
+WORKDIR /app
+
+# Install RDKit using conda
+RUN conda install -y -c conda-forge rdkit
+
+# Copy project files
+COPY app.py /app/app.py
+COPY logic.py /app/logic.py
+COPY templates /app/templates
+
+# Install pip requirements
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 7860
+
+CMD ["python", "app.py"]

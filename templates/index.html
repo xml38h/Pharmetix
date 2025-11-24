@@ -150,6 +150,7 @@
             align-items: center;
             gap: 6px;
             box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
 
         button:hover {
@@ -200,6 +201,27 @@
         .results-meta {
             font-size: 12px;
             color: var(--muted);
+        }
+
+        .timing-pill {
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.10);
+            border: 1px solid rgba(34, 197, 94, 0.45);
+            font-size: 11px;
+            color: var(--success);
+        }
+
+        .timing-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
         }
 
         /* ====== جدول الريزلت (ستايل يشبه Excel) ====== */
@@ -296,6 +318,87 @@
             background: linear-gradient(135deg, #16a34a, #16a34a);
         }
 
+        /* ====== شاشة المعالجة (Overlay) ====== */
+        .processing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.88);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+
+        .processing-card {
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #1f2937;
+            padding: 20px 22px 18px;
+            width: min(360px, 90%);
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(15, 23, 42, 0.9);
+        }
+
+        .processing-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .processing-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .processing-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* الدائرة الدوارة */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            border: 2px solid rgba(148, 163, 184, 0.4);
+            border-top-color: var(--primary);
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-meta {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        /* (باقي ستايلات progress-bar موجودة لكن ما نستخدم الشريط في الـ HTML) */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            border: 1px solid #111827;
+            background: #020617;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.8);
+        }
+
         @media (max-width: 880px) {
             body { padding: 20px 12px; }
             .two-cols { grid-template-columns: minmax(0,1fr); }
@@ -330,7 +433,7 @@
                 </span>
             </div>
 
-            <form method="POST" enctype="multipart/form-data">
+            <form id="run-form" method="POST" enctype="multipart/form-data">
                 <div class="form-row">
                     <label for="user_input">Molecules list</label>
                     <textarea
@@ -355,7 +458,7 @@
                     <div class="hint-small">
                         No hard limit on number of molecules – very large files may be slower.
                     </div>
-                    <button type="submit">
+                    <button type="submit" id="run-btn">
                         <span class="btn-icon">▶</span>
                         <span>Run prediction</span>
                     </button>
@@ -382,7 +485,15 @@
         <div class="results-header">
             <div>
                 <div class="results-title">Results</div>
-                <div class="results-meta">{{ results|length }} molecules processed</div>
+                <div class="results-meta">
+                    {{ results|length }} molecules processed
+                </div>
+                {% if processing_time is not none %}
+                <div class="timing-pill">
+                    <span class="timing-pill-dot"></span>
+                    <span>Completed in {{ '%.2f'|format(processing_time) }} s</span>
+                </div>
+                {% endif %}
             </div>
 
             <a href="{{ url_for('download_results') }}">
@@ -427,5 +538,55 @@
         Pharmetix · Internal demo – not for clinical decision-making.
     </div>
 </div>
+
+<!-- شاشة المعالجة (Overlay) -->
+<div id="processing-overlay" class="processing-overlay">
+    <div class="processing-card">
+        <div class="processing-title">Analyzing molecules…</div>
+        <div class="processing-subtitle">
+            This may take a few seconds for large libraries. Please wait.
+        </div>
+
+        <div class="processing-row">
+            <div class="spinner"></div>
+            <div class="processing-subtitle">
+                Running filters and computing descriptors…
+            </div>
+        </div>
+
+        <!-- شِلْنا شريط التقدم هنا، بس خلّينا الوقت -->
+        <div class="progress-meta">
+            <span id="progress-elapsed">Elapsed: 0.0 s</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('run-form');
+        const btn = document.getElementById('run-btn');
+        const overlay = document.getElementById('processing-overlay');
+        const elapsedLabel = document.getElementById('progress-elapsed');
+
+        if (form && btn && overlay && elapsedLabel) {
+            form.addEventListener('submit', function () {
+                // قفل الزر وغير النص
+                btn.disabled = true;
+                btn.innerHTML = '<span class="btn-icon">⏳</span><span>Processing…</span>';
+
+                // أظهر شاشة التحميل
+                overlay.style.display = 'flex';
+
+                const start = Date.now();
+
+                // عداد وقت حقيقي فقط (بدون شريط)
+                setInterval(function () {
+                    const elapsedSec = (Date.now() - start) / 1000;
+                    elapsedLabel.textContent = 'Elapsed: ' + elapsedSec.toFixed(1) + ' s';
+                }, 100);
+            });
+        }
+    })();
+</script>
 </body>
 </html>

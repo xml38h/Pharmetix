@@ -4,6 +4,7 @@ import io
 import os
 import tempfile
 import pandas as pd
+import time
 
 app = Flask(__name__)
 
@@ -17,20 +18,21 @@ def index():
 
     results = None
     original_text = ""
+    processing_time = None  # وقت الحساب
 
     if request.method == "POST":
         original_text = request.form.get("user_input", "")
 
         lines = []
 
-        # من المربع النصي
+        # -------- من المربع النصي --------
         if original_text:
             for line in original_text.splitlines():
                 line = line.strip()
                 if line:
                     lines.append(line)
 
-        # من ملف مرفوع
+        # -------- من ملف مرفوع --------
         uploaded = request.files.get("molecule_file")
         if uploaded and uploaded.filename:
             filename = uploaded.filename
@@ -49,7 +51,7 @@ def index():
                     file_bytes = uploaded.read()
                     df = pd.read_excel(io.BytesIO(file_bytes))
 
-                    # نحاول نحدد عمود SMILES
+                    # تحديد العمود الصحيح
                     col = None
                     for cand in ["SMILES", "smiles", "Smiles", "Mol", "Name"]:
                         if cand in df.columns:
@@ -62,24 +64,20 @@ def index():
                         if val.strip():
                             lines.append(val.strip())
 
-                # ملفات SDF / SDF.GZ
+                # ملفات SDF
                 elif ext in ("sdf", "sdf.gz"):
-                    # نحفظ الملف مؤقتاً على الديسك عشان نستخدم load_molecules من logic.py
                     suffix = "." + ext
                     fd, tmp_path = tempfile.mkstemp(suffix=suffix)
                     os.close(fd)
 
                     try:
                         uploaded.save(tmp_path)
-
-                        # نستخدم نفس الفنكشن حقك في logic.py
                         mols = logic.load_molecules(tmp_path, max_mols=logic.MAX_MOLS)
                         for smi, m in mols:
                             smi = str(smi).strip()
                             if smi:
                                 lines.append(smi)
                     finally:
-                        # حذف الملف المؤقت
                         if os.path.exists(tmp_path):
                             os.remove(tmp_path)
 
@@ -90,17 +88,23 @@ def index():
                     "details": f"Could not read file: {e}",
                 }]
 
-        # تشغيل الموديل
+        # -------- تشغيل الموديل --------
         if lines and results is None:
+            start = time.time()
             results = logic.run_model_on_input(lines)
-            last_results = results  # تخزين النتائج
+            end = time.time()
 
-    # has_excel عشان زر التحميل في الواجهة
+            processing_time = end - start  # الوقت بالثواني
+            last_results = results
+
+            print(f"Processed {len(results)} molecules in {processing_time:.3f} s")
+
     return render_template(
         "index.html",
         results=results,
         original_text=original_text,
-        has_excel=results is not None
+        has_excel=results is not None,
+        processing_time=processing_time
     )
 
 
@@ -115,7 +119,6 @@ def download_results():
 
     df = logic.results_to_dataframe(last_results)
 
-    # نحول DataFrame إلى ملف Excel في الذاكرة
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Results")
@@ -130,6 +133,8 @@ def download_results():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    print(f">>> Pharmetix server running at: http://127.0.0.1:{port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    import os
+    port = int(os.environ.get("PORT", 7860))  # Render يعطي رقم بورت تلقائي
+    print(f">>> Pharmetix server running on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=False)
+    
